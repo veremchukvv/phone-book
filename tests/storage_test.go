@@ -48,10 +48,6 @@ func TestStore_FindFriends(t *testing.T) {
 	err = testCtx.store.SaveRelation(context.Background(), &entities.Relation{UserID: 1, RelationUserID: 3})
 	err = testCtx.store.SaveRelation(context.Background(), &entities.Relation{UserID: 1, RelationUserID: 4})
 
-	for {
-
-	}
-
 	rel, err := testCtx.store.FindFriends(context.Background(), 1)
 	if err != nil {
 		t.Fatal(err)
