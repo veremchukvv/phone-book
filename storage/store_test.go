@@ -3,10 +3,12 @@ package storage
 import (
 	"context"
 	"database/sql"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/sirupsen/logrus"
 	"regexp"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jackc/pgx/v5"
+	"github.com/sirupsen/logrus"
 )
 
 type DBMock struct {
@@ -59,6 +61,28 @@ func (d *DBMock) QueryContext(ctx context.Context, sql string, args ...interface
 		}
 		return &RowsMock{rows: r}, nil
 	}()
+}
+
+func (d *DBMock) ExecWithTransaction(ctx context.Context, sql string, txOptions pgx.TxOptions, args ...interface{}) (Result, error) {
+	// return func() (Rows, error) {
+	// 	r, err := d.db.QueryContext(ctx, sql, args...)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	return &RowsMock{rows: r}, nil
+	// }()
+	return nil, nil
+}
+
+func (d *DBMock) StartTX(ctx context.Context, opts pgx.TxOptions) (pgx.Tx, error) {
+	// return func() (Rows, error) {
+	// 	r, err := d.db.QueryContext(ctx, sql, args...)
+	// 	if err != nil {]
+	// 		return nil, err
+	// 	}
+	// 	return &RowsMock{rows: r}, nil
+	// }()
+	return nil, nil
 }
 
 func TestStore_FindUserByPhone(t *testing.T) {

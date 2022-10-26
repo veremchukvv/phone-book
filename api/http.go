@@ -2,15 +2,18 @@ package api
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"integ/entities"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type RelationService interface {
 	SaveContacts(ctx context.Context, userID int, contacts entities.ContactList) error
+	FindFriends(ctx context.Context, userID int) (entities.FriendsList, error)
+	GetName(ctx context.Context, userID int) (string, error)
 }
 
 type HTTPHandler struct {
@@ -53,9 +56,35 @@ func (h *HTTPHandler) AddContacts(c *gin.Context) {
 }
 
 func (h *HTTPHandler) Friends(c *gin.Context) {
-	panic("not implemented")
+	userIDstr := c.Param("userID")
+	userID, err := strconv.Atoi(userIDstr)
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	friends, err := h.svc.FindFriends(c.Request.Context(), userID)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(200, friends)
 }
 
 func (h *HTTPHandler) Name(c *gin.Context) {
-	panic("not implemented")
+	userIDstr := c.Param("userID")
+	userID, err := strconv.Atoi(userIDstr)
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	name, err := h.svc.GetName(c.Request.Context(), userID)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(200, name)
 }
