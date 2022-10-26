@@ -63,8 +63,6 @@ func (s *Store) FindUserByPhone(ctx context.Context, number string) (*entities.U
 	if err != nil {
 		return nil, fmt.Errorf("failed to build a query user")
 	}
-	log.Print(selectSQL)
-	log.Print(args)
 
 	if ctx.Value("tx") != nil {
 		t := ctx.Value("tx").(*pgx.Tx)
@@ -75,13 +73,22 @@ func (s *Store) FindUserByPhone(ctx context.Context, number string) (*entities.U
 			return nil, fmt.Errorf("failed to execute a query user")
 		}
 
+		defer rows.Close()
+
+		log.Print("in transaction")
+
 		userRaws := make([]*UserRaw, 0)
+
 		for rows.Next() {
 			userRaw, err := scanUser(rows)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read user from database")
 			}
 			userRaws = append(userRaws, userRaw)
+		}
+
+		if len(userRaws) == 0 {
+			return nil, err
 		}
 
 		user := buildUser(userRaws[0])
@@ -126,7 +133,6 @@ func (s *Store) SaveRelation(ctx context.Context, relation *entities.Relation) e
 		if err != nil {
 			return fmt.Errorf("failed to build a query insert relation")
 		}
-
 	}
 
 	// реализация без транзакций

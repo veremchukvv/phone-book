@@ -13,6 +13,7 @@ type DB interface {
 	// ExecWithTransaction(ctx context.Context, sql string, txOptions pgx.TxOptions, args ...interface{}) (Result, error)
 	QueryContext(ctx context.Context, sql string, args ...interface{}) (Rows, error)
 	StartTX(ctx context.Context, opts pgx.TxOptions) (pgx.Tx, error)
+	EndTX(ctx context.Context, tx pgx.Tx) error
 }
 
 type Store struct {
@@ -70,24 +71,36 @@ func (p *PGConn) QueryContext(ctx context.Context, sql string, args ...any) (Row
 // }
 
 func (p *PGConn) StartTX(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error) {
+	log.Print("Transaction opened")
 	tx, err := p.conn.BeginTx(ctx, pgx.TxOptions{})
 
 	if err != nil {
 		log.Print(err)
 		return nil, err
 	}
-	defer func() {
-		if err != nil {
-			log.Print(err)
-			log.Print("Transaction Rollbacked")
-			tx.Rollback(ctx)
-		} else {
-			tx.Commit(ctx)
-			log.Print("Transaction Completed")
-		}
-	}()
+	// defer func() {
+	// 	if err != nil {
+	// 		log.Print(err)
+	// 		log.Print("Transaction Rollbacked")
+	// 		tx.Rollback(ctx)
+	// 	} else {
+	// 		tx.Commit(ctx)
+	// 		log.Print("Transaction Completed")
+	// 	}
+	// }()
 
 	return tx, nil
+}
+
+func (p *PGConn) EndTX(ctx context.Context, tx pgx.Tx) error {
+
+	err := tx.Commit(ctx)
+	if err != nil {
+		return err
+	}
+	log.Print("Transaction Completed")
+
+	return nil
 }
 
 type Row interface {
@@ -116,4 +129,46 @@ func (s *Store) Exec(ctx context.Context, sql string, args ...interface{}) (int6
 		return 0, err
 	}
 	return result.RowsAffected(), nil
+}
+
+func (s *Store) StartTX(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error) {
+	tx, err := s.db.StartTX(ctx, pgx.TxOptions{})
+
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+	// defer func() {
+	// 	if err != nil {
+	// 		log.Print(err)
+	// 		log.Print("Transaction Rollbacked")
+	// 		tx.Rollback(ctx)
+	// 	} else {
+	// 		tx.Commit(ctx)
+	// 		log.Print("Transaction Completed")
+	// 	}
+	// }()
+
+	return tx, nil
+}
+
+func (s *Store) EndTX(ctx context.Context, tx pgx.Tx) error {
+
+	log.Print("Transaction ended")
+
+	err := tx.Commit(ctx)
+	if err != nil {
+		return err
+	}
+	log.Print("Transaction Completed")
+
+	return nil
+}
+
+func (s *Store) ExecContext(ctx context.Context, sql string, args ...interface{}) (Result, error) {
+	return nil, nil
+}
+
+func (s *Store) QueryContext(ctx context.Context, sql string, args ...any) (Rows, error) {
+	return nil, nil
 }

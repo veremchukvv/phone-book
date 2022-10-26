@@ -3,6 +3,9 @@ package service
 import (
 	"context"
 	"integ/entities"
+	"integ/storage"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type ContactStore interface {
@@ -10,6 +13,7 @@ type ContactStore interface {
 	SaveRelation(ctx context.Context, relation *entities.Relation) error
 	FindFriends(ctx context.Context, uid int) ([]*entities.Friend, error)
 	GetName(ctx context.Context, uid int) (string, error)
+	storage.DB
 }
 
 type ContactService struct {
@@ -23,12 +27,12 @@ func NewContactService(store ContactStore) *ContactService {
 func (c *ContactService) SaveContacts(ctx context.Context, userID int, contacts entities.ContactList) error {
 	relations := make(entities.RelationList, 0)
 
-	// tx, err := c.store.StartTX(ctx, pgx.TxOptions{})
-	// if err != nil {
-	// 	return nil
-	// }
+	tx, err := c.store.StartTX(ctx, pgx.TxOptions{})
+	if err != nil {
+		return nil
+	}
 
-	// ctx = context.WithValue(ctx, "tx", tx)
+	ctx = context.WithValue(ctx, "tx", &tx)
 
 	for _, contact := range contacts {
 		user, err := c.store.FindUserByPhone(ctx, contact.PhoneNumber)
@@ -51,6 +55,12 @@ func (c *ContactService) SaveContacts(ctx context.Context, userID int, contacts 
 			return err
 		}
 	}
+
+	err = c.store.EndTX(ctx, tx)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -78,10 +88,3 @@ func (c *ContactService) GetName(ctx context.Context, userID int) (string, error
 
 	return resp, nil
 }
-
-// func (c *ContactService) ExecWithTX(ctx context.Context, txOptions pgx.TxOptions) (Result, error) {
-
-// 	tx, err := c.db.ExecWithTransaction(ctx, pgx.TxOptions{})
-
-// 	return tx, nil
-// }

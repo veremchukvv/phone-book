@@ -85,6 +85,17 @@ func (d *DBMock) StartTX(ctx context.Context, opts pgx.TxOptions) (pgx.Tx, error
 	return nil, nil
 }
 
+func (d *DBMock) EndTX(ctx context.Context, tx pgx.Tx) error {
+	// return func() (Rows, error) {
+	// 	r, err := d.db.QueryContext(ctx, sql, args...)
+	// 	if err != nil {]
+	// 		return nil, err
+	// 	}
+	// 	return &RowsMock{rows: r}, nil
+	// }()
+	return nil
+}
+
 func TestStore_FindUserByPhone(t *testing.T) {
 	////
 	db, mock, err := sqlmock.New()
