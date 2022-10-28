@@ -71,7 +71,7 @@ func (p *PGConn) QueryContext(ctx context.Context, sql string, args ...any) (Row
 // }
 
 func (p *PGConn) StartTX(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error) {
-	log.Print("Transaction opened")
+	log.Print("Transaction opened (in PGConn)")
 	tx, err := p.conn.BeginTx(ctx, pgx.TxOptions{})
 
 	if err != nil {
@@ -98,7 +98,7 @@ func (p *PGConn) EndTX(ctx context.Context, tx pgx.Tx) error {
 	if err != nil {
 		return err
 	}
-	log.Print("Transaction Completed")
+	log.Print("Transaction Completed (in PGConn)")
 
 	return nil
 }
@@ -154,13 +154,13 @@ func (s *Store) StartTX(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, e
 
 func (s *Store) EndTX(ctx context.Context, tx pgx.Tx) error {
 
-	log.Print("Transaction ended")
+	log.Print("Transaction ended (in Store)")
 
 	err := tx.Commit(ctx)
 	if err != nil {
 		return err
 	}
-	log.Print("Transaction Completed")
+	log.Print("Transaction Completed (in Store)")
 
 	return nil
 }

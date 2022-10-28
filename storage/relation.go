@@ -133,6 +133,7 @@ func (s *Store) SaveRelation(ctx context.Context, relation *entities.Relation) e
 		if err != nil {
 			return fmt.Errorf("failed to build a query insert relation")
 		}
+		return nil
 	}
 
 	// реализация без транзакций

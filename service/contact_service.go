@@ -50,6 +50,7 @@ func (c *ContactService) SaveContacts(ctx context.Context, userID int, contacts 
 	}
 
 	for _, relation := range relations {
+
 		err := c.store.SaveRelation(ctx, relation)
 		if err != nil {
 			return err
