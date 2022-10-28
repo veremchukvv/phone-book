@@ -3,10 +3,11 @@ package tests
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"os"
 	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/testcontainers/testcontainers-go"
 )
@@ -16,10 +17,10 @@ const (
 	defaultPGDatabase    = "test"
 	defaultPGDockerImage = "postgres:12"
 
-	defaultStartupTimeout = 60 * time.Second
+	defaultStartupTimeout = 10 * time.Minute
 )
 
-var defaultPGCmdLineOptions = []string{"-c", "fsync=off"}
+var defaultPGCmdLineOptions = []string{"-c", "fsync=off", "-c", "log_statement=all"}
 
 var postgresURL = ""
 

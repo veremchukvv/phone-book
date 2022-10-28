@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -62,11 +63,11 @@ func loadDefaultSettingsFor(v *viper.Viper) {
 
 	// настройки подключения к бд
 	v.SetDefault("database.host", "127.0.0.1")
-	v.SetDefault("database.port", "5432")
+	v.SetDefault("database.port", "54322")
 	v.SetDefault("database.user", "phone")
 	v.SetDefault("database.password", "phone")
 	v.SetDefault("database.name", "phonedb")
-	v.SetDefault("database.schema", "phone")
+	v.SetDefault("database.schema", "")
 }
 
 func (d *Database) ToDataSourceName() string {

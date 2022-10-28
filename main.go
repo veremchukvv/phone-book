@@ -4,11 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/pflag"
-	"golang.org/x/sync/errgroup"
 	"integ/api"
 	"integ/config"
 	"integ/service"
@@ -16,6 +11,12 @@ import (
 	"integ/storage/migration"
 	"os"
 	"os/signal"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
+	"golang.org/x/sync/errgroup"
 
 	_ "github.com/lib/pq"
 )
